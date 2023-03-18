@@ -10,7 +10,6 @@ sub new {
     my ( $class, %args ) = @_;
     my $self = $class->SUPER::new(
         %args,
-        generate_ppport_h    => 'src/ppport.h',
         c_source             => 'src',
         xs_files             => { './src/Redis__Fast.xs' => './lib/Redis/Fast.xs', },
         include_dirs         => ['src', 'deps/hiredis'],

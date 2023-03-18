@@ -20,7 +20,6 @@ nytprof/
 
 MYMETA.*
 
-/src/ppport.h
 /lib/Redis/Fast.c
 /lib/Redis/Fast.o
 /lib/Redis/Fast.xs

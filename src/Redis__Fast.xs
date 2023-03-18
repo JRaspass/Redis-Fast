@@ -455,28 +455,19 @@ static redis_fast_reply_t Redis__Fast_decode_reply(pTHX_ Redis__Fast self, redis
         AV* av = newAV();
         size_t i;
         res.result = sv_2mortal(newRV_noinc((SV*)av));
+        av_extend(av, reply->elements);
 
         for (i = 0; i < reply->elements; i++) {
             redis_fast_reply_t elem = Redis__Fast_decode_reply(aTHX_ self, reply->element[i], collect_errors);
             if(collect_errors) {
                 AV* elem_av = (AV*)sv_2mortal((SV*)newAV());
-                if(elem.result) {
-                    av_push(elem_av, SvREFCNT_inc(elem.result));
-                } else {
-                    av_push(elem_av, newSV(0));
-                }
-                if(elem.error) {
-                    av_push(elem_av, SvREFCNT_inc(elem.error));
-                } else {
-                    av_push(elem_av, newSV(0));
-                }
-                av_push(av, newRV_inc((SV*)elem_av));
+                av_store_simple(elem_av, 0, elem.result ? SvREFCNT_inc(elem.result) : newSV(0));
+                av_store_simple(elem_av, 1, elem.error  ? SvREFCNT_inc(elem.error)  : newSV(0));
+
+                av_store_simple(av, i, newRV_inc((SV*)elem_av));
             } else {
-                if(elem.result) {
-                    av_push(av, SvREFCNT_inc(elem.result));
-                } else {
-                    av_push(av, newSV(0));
-                }
+                av_store_simple(av, i, elem.result ? SvREFCNT_inc(elem.result) : newSV(0));
+
                 if(elem.error && !res.error) {
                     res.error = elem.error;
                 }
